@@ -92,7 +92,7 @@ if uploaded_file is not None:
         selected_rows.append(data[(data['Variable'] == selected_covariate2) & (data['Outcome'] == selected_outcome2) & (data['Sample'] == selected_sample2)])
 
     with col2:
-        st.subheader("Plot 3")
+        st.subheader("Plot 2")
         scol7, scol8, scol9 = st.columns(3)
         with scol7:
             selected_label3 = st.selectbox("Covariate (Plot 3)", labels, key='cov3')
