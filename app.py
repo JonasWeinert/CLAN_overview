@@ -57,6 +57,8 @@ if uploaded_file is not None:
     data = load_data(uploaded_file)
     
     covariates = data['Variable'].unique()
+    labels = data.iloc[:, data.columns.get_loc('Variable') + 1].unique()
+    label_to_covariate = dict(zip(labels, covariates))
     outcomes = data['Outcome'].unique()
     samples = data['Sample'].unique()
     
@@ -65,10 +67,11 @@ if uploaded_file is not None:
     selected_rows = []
 
     with col1:
-        st.subheader("Plot1")
+        st.subheader("Plot 1")
         scol1, scol2, scol3 = st.columns(3)
         with scol1:
-            selected_covariate1 = st.selectbox("Covariate (Plot 1)", covariates, key='cov1')
+            selected_label1 = st.selectbox("Covariate (Plot 1)", labels, key='cov1')
+            selected_covariate1 = label_to_covariate[selected_label1]
         with scol2:
             selected_outcome1 = st.selectbox("Outcome (Plot 1)", outcomes, key='out1')
         with scol3:
@@ -76,10 +79,11 @@ if uploaded_file is not None:
         plot_ci(selected_covariate1, selected_outcome1, selected_sample1, data)
         selected_rows.append(data[(data['Variable'] == selected_covariate1) & (data['Outcome'] == selected_outcome1) & (data['Sample'] == selected_sample1)])
 
-        st.subheader("Plot2")
+        st.subheader("Plot 3")
         scol4, scol5, scol6 = st.columns(3)
         with scol4:
-            selected_covariate2 = st.selectbox("Covariate (Plot 2)", covariates, key='cov2')
+            selected_label2 = st.selectbox("Covariate (Plot 2)", labels, key='cov2')
+            selected_covariate2 = label_to_covariate[selected_label2]
         with scol5:
             selected_outcome2 = st.selectbox("Outcome (Plot 2)", outcomes, key='out2')
         with scol6:
@@ -88,10 +92,11 @@ if uploaded_file is not None:
         selected_rows.append(data[(data['Variable'] == selected_covariate2) & (data['Outcome'] == selected_outcome2) & (data['Sample'] == selected_sample2)])
 
     with col2:
-        st.subheader("Plot3")
+        st.subheader("Plot 3")
         scol7, scol8, scol9 = st.columns(3)
         with scol7:
-            selected_covariate3 = st.selectbox("Covariate (Plot 3)", covariates, key='cov3')
+            selected_label3 = st.selectbox("Covariate (Plot 3)", labels, key='cov3')
+            selected_covariate3 = label_to_covariate[selected_label3]
         with scol8:
             selected_outcome3 = st.selectbox("Outcome (Plot 3)", outcomes, key='out3')
         with scol9:
@@ -99,10 +104,11 @@ if uploaded_file is not None:
         plot_ci(selected_covariate3, selected_outcome3, selected_sample3, data)
         selected_rows.append(data[(data['Variable'] == selected_covariate3) & (data['Outcome'] == selected_outcome3) & (data['Sample'] == selected_sample3)])
 
-        st.subheader("Plot4")
+        st.subheader("Plot 4")
         scol10, scol11, scol12 = st.columns(3)
         with scol10:
-            selected_covariate4 = st.selectbox("Covariate (Plot 4)", covariates, key='cov4')
+            selected_label4 = st.selectbox("Covariate (Plot 4)", labels, key='cov4')
+            selected_covariate4 = label_to_covariate[selected_label4]
         with scol11:
             selected_outcome4 = st.selectbox("Outcome (Plot 4)", outcomes, key='out4')
         with scol12:
@@ -118,5 +124,4 @@ if uploaded_file is not None:
     if alld == True:
         selected_data = data
     
-
     st.data_editor(selected_data)
