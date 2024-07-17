@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import io
 
 # Function to load data
 @st.cache_data
@@ -125,3 +126,12 @@ if uploaded_file is not None:
         selected_data = data
     
     st.data_editor(selected_data)
+
+    # Add download button for raw data
+    with open(uploaded_file, "rb") as file:
+        btn = st.download_button(
+            label="Download all CLAN data as XLSX",
+            data=file,
+            file_name='SASP CLAN.xlsx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
