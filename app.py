@@ -17,6 +17,11 @@ def plot_ci(variable, outcome, sample, data):
     estimates = variable_data[[f'{g}_Estimate' for g in groups]].values.flatten()
     ci_lowers = variable_data[[f'{g}_CI_lower' for g in groups]].values.flatten()
     ci_uppers = variable_data[[f'{g}_CI_upper' for g in groups]].values.flatten()
+    
+    # Extract p-values for 5-1, 5-3, and 3-1
+    p_value_5_1 = round(variable_data['G5-G1_p_value'].values[0], 3)
+    p_value_5_3 = round(variable_data['G5-G3_p_value'].values[0], 3)
+    p_value_3_1 = round(variable_data['G3-G1_p_value'].values[0], 3)
 
     # Create the plot using Matplotlib
     fig, ax = plt.subplots()
@@ -29,6 +34,16 @@ def plot_ci(variable, outcome, sample, data):
     ax.set_xlabel('Groups')
     ax.set_ylabel('Estimates')
     ax.legend()
+
+    # Annotate the plot with p-values
+    textstr = '\n'.join((
+        f'p-value (G5-G1): {p_value_5_1:.3f}',
+        f'p-value (G5-G3): {p_value_5_3:.3f}',
+        f'p-value (G3-G1): {p_value_3_1:.3f}',
+    ))
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=10,
+            verticalalignment='top', horizontalalignment='right', bbox=props)
 
     st.pyplot(fig)
 
