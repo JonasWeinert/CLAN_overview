@@ -62,6 +62,8 @@ if uploaded_file is not None:
     
     col1, col2 = st.columns(2)
     
+    selected_rows = []
+
     with col1:
         st.subheader("Plot1")
         scol1, scol2, scol3 = st.columns(3)
@@ -72,9 +74,9 @@ if uploaded_file is not None:
         with scol3:
             selected_sample1 = st.selectbox("Sample (Plot 1)", samples, key='sam1')
         plot_ci(selected_covariate1, selected_outcome1, selected_sample1, data)
-        
-        st.subheader("Plot3")
+        selected_rows.append(data[(data['Variable'] == selected_covariate1) & (data['Outcome'] == selected_outcome1) & (data['Sample'] == selected_sample1)])
 
+        st.subheader("Plot2")
         scol4, scol5, scol6 = st.columns(3)
         with scol4:
             selected_covariate2 = st.selectbox("Covariate (Plot 2)", covariates, key='cov2')
@@ -83,10 +85,10 @@ if uploaded_file is not None:
         with scol6:
             selected_sample2 = st.selectbox("Sample (Plot 2)", samples, key='sam2')
         plot_ci(selected_covariate2, selected_outcome2, selected_sample2, data)
-        
-    with col2:
-        st.subheader("Plot2")
+        selected_rows.append(data[(data['Variable'] == selected_covariate2) & (data['Outcome'] == selected_outcome2) & (data['Sample'] == selected_sample2)])
 
+    with col2:
+        st.subheader("Plot3")
         scol7, scol8, scol9 = st.columns(3)
         with scol7:
             selected_covariate3 = st.selectbox("Covariate (Plot 3)", covariates, key='cov3')
@@ -95,10 +97,9 @@ if uploaded_file is not None:
         with scol9:
             selected_sample3 = st.selectbox("Sample (Plot 3)", samples, key='sam3')
         plot_ci(selected_covariate3, selected_outcome3, selected_sample3, data)
-        
-    with col2:
-        st.subheader("Plot4")
+        selected_rows.append(data[(data['Variable'] == selected_covariate3) & (data['Outcome'] == selected_outcome3) & (data['Sample'] == selected_sample3)])
 
+        st.subheader("Plot4")
         scol10, scol11, scol12 = st.columns(3)
         with scol10:
             selected_covariate4 = st.selectbox("Covariate (Plot 4)", covariates, key='cov4')
@@ -107,5 +108,15 @@ if uploaded_file is not None:
         with scol12:
             selected_sample4 = st.selectbox("Sample (Plot 4)", samples, key='sam4')
         plot_ci(selected_covariate4, selected_outcome4, selected_sample4, data)
+        selected_rows.append(data[(data['Variable'] == selected_covariate4) & (data['Outcome'] == selected_outcome4) & (data['Sample'] == selected_sample4)])
 
-st.data_editor(data)
+    # Concatenate all selected rows and display them
+    alld = st.checkbox("Display all Data", value=False)
+
+    selected_data = pd.concat(selected_rows).drop_duplicates()
+
+    if alld == True:
+        selected_data = data
+    
+
+    st.data_editor(selected_data)
