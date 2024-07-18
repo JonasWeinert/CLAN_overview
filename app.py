@@ -24,6 +24,9 @@ def plot_ci(variable, outcome, sample, data):
     p_value_5_3 = round(variable_data['G5-G3_p_value'].values[0], 3)
     p_value_3_1 = round(variable_data['G3-G1_p_value'].values[0], 3)
 
+    # Calculate the average of the estimates
+    average_estimate = estimates.mean()
+
     # Create the plot using Matplotlib
     fig, ax = plt.subplots()
     ax.plot(groups, estimates, marker='o', linestyle='-', color='blue', label='Estimate')
@@ -31,10 +34,15 @@ def plot_ci(variable, outcome, sample, data):
     # Plot the confidence intervals
     ax.fill_between(groups, ci_lowers, ci_uppers, color='blue', alpha=0.2, label='95% CI')
 
-    ax.set_title(f'CI Plot for {variable} - {outcome} - {sample}')
+    # Add a horizontal line at the covariate average
+    ax.axhline(y=average_estimate, color='red', linestyle='--', label=f'Covariate Mean: ({average_estimate:.2f})')
+
+    ax.set_title(f'CLAN of {variable} of {outcome} in {sample} sample')
     ax.set_xlabel('Groups')
-    ax.set_ylabel('Estimates')
-    ax.legend()
+    ax.set_ylabel('Covariate Estimates')
+
+    # Force the legend box to be at the top left
+    ax.legend(loc='upper left')
 
     # Annotate the plot with p-values
     textstr = '\n'.join((
