@@ -135,6 +135,10 @@ if uploaded_file is not None:
     
     st.data_editor(selected_data)
 
+
+        
+with st.sidebar:
+    st.header('Download Data')
     # Add download button for raw data
     with open(uploaded_file, "rb") as file:
         btn = st.download_button(
@@ -143,3 +147,4 @@ if uploaded_file is not None:
             file_name='SASP CLAN.xlsx',
             mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
+
