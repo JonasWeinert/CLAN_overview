@@ -143,6 +143,7 @@ with blp:
     if uploaded_eval is not None:
         evaldata = load_data(uploaded_eval)
         st.data_editor(evaldata)
+        st.markdown("* All specifications are with all countries pooled excluding Senegal (AES)")
 
         
 with st.sidebar:
