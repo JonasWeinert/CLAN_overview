@@ -61,80 +61,88 @@ st.set_page_config(page_title='CI Plot Viewer', page_icon="🧡", layout="wide")
 
 # File uploader
 uploaded_file = "data.xlsx"
+uploaded_eval = "eval.xlsx"
 
-if uploaded_file is not None:
-    data = load_data(uploaded_file)
-    
-    covariates = data['Variable'].unique()
-    labels = data.iloc[:, data.columns.get_loc('Variable') + 1].unique()
-    label_to_covariate = dict(zip(labels, covariates))
-    outcomes = data['Outcome'].unique()
-    samples = data['Sample'].unique()
-    
-    col1, col2 = st.columns(2)
-    
-    selected_rows = []
+clan, blp = st.tabs(["CLAN", "BLP/Gates"])
 
-    with col1:
-        st.subheader("Plot 1")
-        scol1, scol2, scol3 = st.columns(3)
-        with scol1:
-            selected_label1 = st.selectbox("Covariate (Plot 1)", labels, key='cov1')
-            selected_covariate1 = label_to_covariate[selected_label1]
-        with scol2:
-            selected_outcome1 = st.selectbox("Outcome (Plot 1)", outcomes, key='out1')
-        with scol3:
-            selected_sample1 = st.selectbox("Sample (Plot 1)", samples, key='sam1')
-        plot_ci(selected_covariate1, selected_outcome1, selected_sample1, data)
-        selected_rows.append(data[(data['Variable'] == selected_covariate1) & (data['Outcome'] == selected_outcome1) & (data['Sample'] == selected_sample1)])
+with clan: 
+    if uploaded_file is not None:
+        data = load_data(uploaded_file)
+        
+        covariates = data['Variable'].unique()
+        labels = data.iloc[:, data.columns.get_loc('Variable') + 1].unique()
+        label_to_covariate = dict(zip(labels, covariates))
+        outcomes = data['Outcome'].unique()
+        samples = data['Sample'].unique()
+        
+        col1, col2 = st.columns(2)
+        
+        selected_rows = []
 
-        st.subheader("Plot 3")
-        scol4, scol5, scol6 = st.columns(3)
-        with scol4:
-            selected_label2 = st.selectbox("Covariate (Plot 2)", labels, key='cov2')
-            selected_covariate2 = label_to_covariate[selected_label2]
-        with scol5:
-            selected_outcome2 = st.selectbox("Outcome (Plot 2)", outcomes, key='out2')
-        with scol6:
-            selected_sample2 = st.selectbox("Sample (Plot 2)", samples, key='sam2')
-        plot_ci(selected_covariate2, selected_outcome2, selected_sample2, data)
-        selected_rows.append(data[(data['Variable'] == selected_covariate2) & (data['Outcome'] == selected_outcome2) & (data['Sample'] == selected_sample2)])
+        with col1:
+            st.subheader("Plot 1")
+            scol1, scol2, scol3 = st.columns(3)
+            with scol1:
+                selected_label1 = st.selectbox("Covariate (Plot 1)", labels, key='cov1')
+                selected_covariate1 = label_to_covariate[selected_label1]
+            with scol2:
+                selected_outcome1 = st.selectbox("Outcome (Plot 1)", outcomes, key='out1')
+            with scol3:
+                selected_sample1 = st.selectbox("Sample (Plot 1)", samples, key='sam1')
+            plot_ci(selected_covariate1, selected_outcome1, selected_sample1, data)
+            selected_rows.append(data[(data['Variable'] == selected_covariate1) & (data['Outcome'] == selected_outcome1) & (data['Sample'] == selected_sample1)])
 
-    with col2:
-        st.subheader("Plot 2")
-        scol7, scol8, scol9 = st.columns(3)
-        with scol7:
-            selected_label3 = st.selectbox("Covariate (Plot 3)", labels, key='cov3')
-            selected_covariate3 = label_to_covariate[selected_label3]
-        with scol8:
-            selected_outcome3 = st.selectbox("Outcome (Plot 3)", outcomes, key='out3')
-        with scol9:
-            selected_sample3 = st.selectbox("Sample (Plot 3)", samples, key='sam3')
-        plot_ci(selected_covariate3, selected_outcome3, selected_sample3, data)
-        selected_rows.append(data[(data['Variable'] == selected_covariate3) & (data['Outcome'] == selected_outcome3) & (data['Sample'] == selected_sample3)])
+            st.subheader("Plot 3")
+            scol4, scol5, scol6 = st.columns(3)
+            with scol4:
+                selected_label2 = st.selectbox("Covariate (Plot 2)", labels, key='cov2')
+                selected_covariate2 = label_to_covariate[selected_label2]
+            with scol5:
+                selected_outcome2 = st.selectbox("Outcome (Plot 2)", outcomes, key='out2')
+            with scol6:
+                selected_sample2 = st.selectbox("Sample (Plot 2)", samples, key='sam2')
+            plot_ci(selected_covariate2, selected_outcome2, selected_sample2, data)
+            selected_rows.append(data[(data['Variable'] == selected_covariate2) & (data['Outcome'] == selected_outcome2) & (data['Sample'] == selected_sample2)])
 
-        st.subheader("Plot 4")
-        scol10, scol11, scol12 = st.columns(3)
-        with scol10:
-            selected_label4 = st.selectbox("Covariate (Plot 4)", labels, key='cov4')
-            selected_covariate4 = label_to_covariate[selected_label4]
-        with scol11:
-            selected_outcome4 = st.selectbox("Outcome (Plot 4)", outcomes, key='out4')
-        with scol12:
-            selected_sample4 = st.selectbox("Sample (Plot 4)", samples, key='sam4')
-        plot_ci(selected_covariate4, selected_outcome4, selected_sample4, data)
-        selected_rows.append(data[(data['Variable'] == selected_covariate4) & (data['Outcome'] == selected_outcome4) & (data['Sample'] == selected_sample4)])
+        with col2:
+            st.subheader("Plot 2")
+            scol7, scol8, scol9 = st.columns(3)
+            with scol7:
+                selected_label3 = st.selectbox("Covariate (Plot 3)", labels, key='cov3')
+                selected_covariate3 = label_to_covariate[selected_label3]
+            with scol8:
+                selected_outcome3 = st.selectbox("Outcome (Plot 3)", outcomes, key='out3')
+            with scol9:
+                selected_sample3 = st.selectbox("Sample (Plot 3)", samples, key='sam3')
+            plot_ci(selected_covariate3, selected_outcome3, selected_sample3, data)
+            selected_rows.append(data[(data['Variable'] == selected_covariate3) & (data['Outcome'] == selected_outcome3) & (data['Sample'] == selected_sample3)])
 
-    # Concatenate all selected rows and display them
-    alld = st.checkbox("Display all Data", value=False)
+            st.subheader("Plot 4")
+            scol10, scol11, scol12 = st.columns(3)
+            with scol10:
+                selected_label4 = st.selectbox("Covariate (Plot 4)", labels, key='cov4')
+                selected_covariate4 = label_to_covariate[selected_label4]
+            with scol11:
+                selected_outcome4 = st.selectbox("Outcome (Plot 4)", outcomes, key='out4')
+            with scol12:
+                selected_sample4 = st.selectbox("Sample (Plot 4)", samples, key='sam4')
+            plot_ci(selected_covariate4, selected_outcome4, selected_sample4, data)
+            selected_rows.append(data[(data['Variable'] == selected_covariate4) & (data['Outcome'] == selected_outcome4) & (data['Sample'] == selected_sample4)])
 
-    selected_data = pd.concat(selected_rows).drop_duplicates()
+        # Concatenate all selected rows and display them
+        alld = st.checkbox("Display all Data", value=False)
 
-    if alld == True:
-        selected_data = data
-    
-    st.data_editor(selected_data)
+        selected_data = pd.concat(selected_rows).drop_duplicates()
 
+        if alld == True:
+            selected_data = data
+        
+        st.data_editor(selected_data)
+
+with blp:
+    if uploaded_eval is not None:
+        evaldata = load_data(uploaded_eval)
+        st.data_editor(evaldata)
 
         
 with st.sidebar:
@@ -147,4 +155,9 @@ with st.sidebar:
             file_name='SASP CLAN.xlsx',
             mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
+    
+    st.header("Quantile Setting")
+    quantiles = st.selectbox("Show calculations based on GATES in:", ("Quintiles", "Terciles"))
+    if quantiles == "Terciles":
+        st.subheader("Terciles currently calculating. Will be added soon")
 
