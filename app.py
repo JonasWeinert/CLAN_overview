@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import io
 
 # Function to load data
-@st.cache_data
+##@st.cache_data
 def load_data(file_path):
     return pd.read_excel(file_path)
 
