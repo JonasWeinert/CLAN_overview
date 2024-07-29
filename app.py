@@ -1,11 +1,17 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as stats
 import io
 
 # Function to load data
 def load_data(file_path):
     return pd.read_excel(file_path)
+
+# Function to calculate p-value from z-score
+def calculate_p_value(z_score):
+    return 2 * (1 - stats.norm.cdf(abs(z_score)))
 
 # Function to plot CI plot
 def plot_ci(variable, outcome, sample, data, quantiles):
@@ -13,15 +19,17 @@ def plot_ci(variable, outcome, sample, data, quantiles):
     variable_data = data[(data['Variable'] == variable) & (data['Outcome'] == outcome) & (data['Sample'] == sample)]
 
     if variable_data.empty:
-            st.error(f"CLAN of {variable} for {outcome} in {sample} not available due to BLP B2 > 0.05")
-            return
+        st.error(f"CLAN of {variable} for {outcome} in {sample} not available due to BLP B2 > 0.05")
+        return
     
     if quantiles == 'Quintiles':
         groups = ['G1', 'G2', 'G3', 'G4', 'G5']
         p_value_labels = ['G5-G1_p_value', 'G5-G3_p_value', 'G3-G1_p_value']
+        comparison_group = 'G5'
     elif quantiles == 'Terciles':
         groups = ['G1', 'G2', 'G3']
         p_value_labels = ['G3-G1_p_value', 'G2-G1_p_value', 'G3-G2_p_value']
+        comparison_group = 'G3'
 
     # Extract estimates and confidence intervals
     estimates = variable_data[[f'{g}_Estimate' for g in groups]].values.flatten()
@@ -33,6 +41,19 @@ def plot_ci(variable, outcome, sample, data, quantiles):
 
     # Calculate the average of the estimates
     average_estimate = estimates.mean()
+
+    # Calculate the standard error of the comparison group
+    comparison_estimate = variable_data[f'{comparison_group}_Estimate'].values[0]
+    comparison_se = (variable_data[f'{comparison_group}_CI_upper'].values[0] - variable_data[f'{comparison_group}_CI_lower'].values[0]) / 3.92
+
+    # Calculate the standard error of the average
+    average_se = np.std(estimates) / np.sqrt(len(estimates))
+
+    # Calculate the z-score for the difference
+    z_score = (comparison_estimate - average_estimate) / np.sqrt(comparison_se**2 + average_se**2)
+
+    # Calculate the p-value
+    mean_diff_p_value = calculate_p_value(z_score)
 
     # Create the plot using Matplotlib
     fig, ax = plt.subplots()
@@ -53,11 +74,50 @@ def plot_ci(variable, outcome, sample, data, quantiles):
 
     # Annotate the plot with p-values
     textstr = '\n'.join([f'p-value ({label.split("_")[0]}): {p:.3f}' for label, p in zip(p_value_labels, p_values)])
+    textstr += f'\np-value ({comparison_group}-Mean): {mean_diff_p_value:.3f}'
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=10,
             verticalalignment='top', horizontalalignment='right', bbox=props)
 
     st.pyplot(fig)
+
+# Function to create overview data
+# Function to create overview data
+def create_overview(data, quantiles):
+    if quantiles == 'Quintiles':
+        groups = ['G1', 'G2', 'G3', 'G4', 'G5']
+        comparison_group = 'G5'
+    elif quantiles == 'Terciles':
+        groups = ['G1', 'G2', 'G3']
+        comparison_group = 'G3'
+
+    overview_data = []
+    for variable in data['Variable'].unique():
+        for outcome in data['Outcome'].unique():
+            for sample in data['Sample'].unique():
+                variable_data = data[(data['Variable'] == variable) & (data['Outcome'] == outcome) & (data['Sample'] == sample)]
+                if not variable_data.empty:
+                    estimates = variable_data[[f'{g}_Estimate' for g in groups]].values.flatten()
+                    average_estimate = estimates.mean()
+
+                    comparison_estimate = variable_data[f'{comparison_group}_Estimate'].values[0]
+                    comparison_se = (variable_data[f'{comparison_group}_CI_upper'].values[0] - variable_data[f'{comparison_group}_CI_lower'].values[0]) / 3.92
+
+                    average_se = np.std(estimates) / np.sqrt(len(estimates))
+
+                    z_score = (comparison_estimate - average_estimate) / np.sqrt(comparison_se**2 + average_se**2)
+                    mean_diff_p_value = calculate_p_value(z_score)
+
+                    overview_data.append({
+                        'Variable': variable,
+                        'Outcome': outcome,
+                        'Sample': sample,
+                        'Comparison Group': comparison_group,
+                        'Mean Difference P-value': mean_diff_p_value,
+                        'Significant': mean_diff_p_value < 0.05
+                    })
+
+    return pd.DataFrame(overview_data)
 
 # Streamlit app
 st.set_page_config(page_title='CI Plot Viewer', page_icon="🧡", layout="wide")
@@ -68,9 +128,7 @@ uploaded_file_terciles = "data_terciles.xlsx"
 uploaded_file_blp = "eval.xlsx"
 uploaded_file_blp_terc = "eval_terc.xlsx"
 
-
-
-clan, blp = st.tabs(["CLAN", "BLP/Gates"])
+clan, blp, overview_tab = st.tabs(["CLAN", "BLP/Gates", "Gates vs Average for CLAN Overview"])
 
 with st.sidebar:
     st.header("Quantile Setting")
@@ -160,6 +218,14 @@ with blp:
 
     st.data_editor(evaldata)
     st.markdown("* All specifications are with all countries pooled excluding Senegal (AES)")
+
+with overview_tab:
+    overview_data = create_overview(data, quantiles)
+    significant_data = overview_data[overview_data['Significant']]
+    st.header("Significant P-Values")
+    st.dataframe(significant_data)
+    st.header("Overview of all Average vs highest group difference fot Covariates in all Specifications")
+    st.dataframe(overview_data)
 
 with st.sidebar:
     st.header('Download Data')
