@@ -115,6 +115,7 @@ def create_overview(data, quantiles, comparator):
 
                     overview_data.append({
                         'Variable': variable,
+                        'Label' : variable_data['Label'].values[0],
                         'Outcome': outcome,
                         'Sample': sample,
                         'Comparison Group': comparison_group,
