@@ -111,12 +111,15 @@ def create_overview(data, quantiles, comparator):
                         average_se = np.std(estimates) / np.sqrt(len(estimates))
                         z_score = (comparison_estimate - average_estimate) / np.sqrt(comparison_se**2 + average_se**2)
                         mean_diff_p_value = calculate_p_value(z_score)
+                        g1_estimate = average_estimate
 
                     overview_data.append({
                         'Variable': variable,
                         'Outcome': outcome,
                         'Sample': sample,
                         'Comparison Group': comparison_group,
+                        f'{comparator} Estimate': g1_estimate,
+                        f'{comparison_group} Estimate' : comparison_estimate,
                         'Mean Difference P-value': mean_diff_p_value,
                         'Significant': mean_diff_p_value < 0.05
                     })
