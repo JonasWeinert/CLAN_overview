@@ -114,8 +114,8 @@ def create_overview(data, quantiles, comparator):
                         g1_estimate = average_estimate
 
                     overview_data.append({
-                        'Variable': variable,
-                        'Label' : variable_data['Label'].values[0],
+                        #'Variable': variable,
+                        'Variable' : variable_data['Label'].values[0],
                         'Outcome': outcome,
                         'Sample': sample,
                         'Comparison Group': comparison_group,
@@ -140,7 +140,7 @@ clan, blp, overview_tab = st.tabs(["CLAN", "BLP/Gates", "Gates vs Average for CL
 
 with st.sidebar:
     st.header("Quantile Setting")
-    quantiles = st.selectbox("Show calculations based on GATES in:", ("Quintiles", "Terciles"))
+    quantiles = st.selectbox("Show calculations based on GATES in:", ("Terciles", "Quintiles"))
     comparator = st.selectbox("Compare highest GATES group in Overview Tab to:", ("Average", "G1"), key="comp")
 
 with clan: 
