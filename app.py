@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
 import io
-
+comparator = "0"
 # Function to load data
 def load_data(file_path):
     return pd.read_excel(file_path)
@@ -82,8 +82,7 @@ def plot_ci(variable, outcome, sample, data, quantiles):
     st.pyplot(fig)
 
 # Function to create overview data
-# Function to create overview data
-def create_overview(data, quantiles):
+def create_overview(data, quantiles, comparator):
     if quantiles == 'Quintiles':
         groups = ['G1', 'G2', 'G3', 'G4', 'G5']
         comparison_group = 'G5'
@@ -97,16 +96,21 @@ def create_overview(data, quantiles):
             for sample in data['Sample'].unique():
                 variable_data = data[(data['Variable'] == variable) & (data['Outcome'] == outcome) & (data['Sample'] == sample)]
                 if not variable_data.empty:
-                    estimates = variable_data[[f'{g}_Estimate' for g in groups]].values.flatten()
-                    average_estimate = estimates.mean()
-
-                    comparison_estimate = variable_data[f'{comparison_group}_Estimate'].values[0]
-                    comparison_se = (variable_data[f'{comparison_group}_CI_upper'].values[0] - variable_data[f'{comparison_group}_CI_lower'].values[0]) / 3.92
-
-                    average_se = np.std(estimates) / np.sqrt(len(estimates))
-
-                    z_score = (comparison_estimate - average_estimate) / np.sqrt(comparison_se**2 + average_se**2)
-                    mean_diff_p_value = calculate_p_value(z_score)
+                    if comparator == 'G1':
+                        comparison_estimate = variable_data[f'{comparison_group}_Estimate'].values[0]
+                        comparison_se = (variable_data[f'{comparison_group}_CI_upper'].values[0] - variable_data[f'{comparison_group}_CI_lower'].values[0]) / 3.92
+                        g1_estimate = variable_data['G1_Estimate'].values[0]
+                        g1_se = (variable_data['G1_CI_upper'].values[0] - variable_data['G1_CI_lower'].values[0]) / 3.92
+                        z_score = (comparison_estimate - g1_estimate) / np.sqrt(comparison_se**2 + g1_se**2)
+                        mean_diff_p_value = calculate_p_value(z_score)
+                    else:
+                        estimates = variable_data[[f'{g}_Estimate' for g in groups]].values.flatten()
+                        average_estimate = estimates.mean()
+                        comparison_estimate = variable_data[f'{comparison_group}_Estimate'].values[0]
+                        comparison_se = (variable_data[f'{comparison_group}_CI_upper'].values[0] - variable_data[f'{comparison_group}_CI_lower'].values[0]) / 3.92
+                        average_se = np.std(estimates) / np.sqrt(len(estimates))
+                        z_score = (comparison_estimate - average_estimate) / np.sqrt(comparison_se**2 + average_se**2)
+                        mean_diff_p_value = calculate_p_value(z_score)
 
                     overview_data.append({
                         'Variable': variable,
@@ -133,6 +137,7 @@ clan, blp, overview_tab = st.tabs(["CLAN", "BLP/Gates", "Gates vs Average for CL
 with st.sidebar:
     st.header("Quantile Setting")
     quantiles = st.selectbox("Show calculations based on GATES in:", ("Quintiles", "Terciles"))
+    comparator = st.selectbox("Compare highest GATES group in Overview Tab to:", ("Average", "G1"), key="comp")
 
 with clan: 
     if quantiles == "Quintiles":
@@ -220,11 +225,11 @@ with blp:
     st.markdown("* All specifications are with all countries pooled excluding Senegal (AES)")
 
 with overview_tab:
-    overview_data = create_overview(data, quantiles)
+    overview_data = create_overview(data, quantiles, comparator)
     significant_data = overview_data[overview_data['Significant']]
-    st.header("Significant P-Values")
+    st.header("Significant Differences")
     st.dataframe(significant_data)
-    st.header("Overview of all Average vs highest group difference fot Covariates in all Specifications")
+    st.header(f"Overview of all {comparator} vs highest group difference fot Covariates in all Specifications")
     st.dataframe(overview_data)
 
 with st.sidebar:
