@@ -66,8 +66,8 @@ def plot_ci(variable, outcome, sample, data, quantiles):
     ax.axhline(y=average_estimate, color='red', linestyle='--', label=f'Covariate Mean: ({average_estimate:.2f})')
 
     ax.set_title(f'CLAN of {variable} of {outcome} in {sample} sample')
-    ax.set_xlabel('Groups')
-    ax.set_ylabel('Covariate Estimates')
+    ax.set_xlabel('Gates Groups')
+    ax.set_ylabel('Covariate Avg.')
 
     # Force the legend box to be at the top left
     ax.legend(loc='upper left')
@@ -226,14 +226,15 @@ with blp:
         evaldata = load_data(uploaded_file_blp_terc)
 
     st.data_editor(evaldata)
-    st.markdown("* All specifications are with all countries pooled excluding Senegal (AES)")
+    st.markdown(f"* Click on any column to sort. \n * All specifications are with all countries pooled excluding Senegal (AES). \n * P_val_median = Beta2 from Best linear predictor test for evidence of heterogeneity. \n * G1, G2, etc = Group average treatment effects for {quantiles}, p values for difference to 0 in brackets. \n * G[max].1 = Difference between highest and lowest quantile of treatment effects.")
 
 with overview_tab:
     overview_data = create_overview(data, quantiles, comparator)
     significant_data = overview_data[overview_data['Significant']]
     st.header("Significant Differences")
+    st.markdown(f"The table below shows the comparison between the highest group of the {quantiles} and the {comparator} for those covariates for which there is a statistically significant difference. The table on the bottom shows all covariates. You can sort by variable, outcome, or sample by clicking on the resp. column.")
     st.dataframe(significant_data)
-    st.header(f"Overview of all {comparator} vs highest group difference fot Covariates in all Specifications")
+    st.header(f"Overview of all {comparator} vs highest group difference for Covariates in all Specifications")
     st.dataframe(overview_data)
 
 with st.sidebar:
