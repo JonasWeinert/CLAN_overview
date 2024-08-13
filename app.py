@@ -132,6 +132,7 @@ st.set_page_config(page_title='CI Plot Viewer', page_icon="🧡", layout="wide")
 
 # File uploader
 uploaded_file_quintiles = "data.xlsx"
+uploaded_file_quintiles_adj = "data_tercadj.xlsx"
 uploaded_file_terciles = "data_terciles.xlsx"
 uploaded_file_blp = "eval.xlsx"
 uploaded_file_blp_terc = "eval_terc.xlsx"
@@ -140,11 +141,13 @@ clan, blp, overview_tab = st.tabs(["CLAN", "BLP/Gates", "Gates vs Average for CL
 
 with st.sidebar:
     st.header("Quantile Setting")
-    quantiles = st.selectbox("Show calculations based on GATES in:", ("Terciles", "Quintiles"))
+    quantiles = st.selectbox("Show calculations based on GATES in:", ("Terciles", "Quintiles",)) # "Quintiles with other outcomes"))
     comparator = st.selectbox("Compare highest GATES group in Overview Tab to:", ("Average", "G1"), key="comp")
 
 with clan: 
     if quantiles == "Quintiles":
+        data = load_data(uploaded_file_quintiles_adj)
+    elif quantiles == "Quintiles with other outcomes":
         data = load_data(uploaded_file_quintiles)
     else:
         data = load_data(uploaded_file_terciles)
