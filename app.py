@@ -236,6 +236,7 @@ with overview_tab:
     st.dataframe(significant_data)
     st.header(f"Overview of all {comparator} vs highest group difference for Covariates in all Specifications")
     st.dataframe(overview_data)
+    
 
 with st.sidebar:
     st.header('Download Data')
